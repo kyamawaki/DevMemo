@@ -1,0 +1,58 @@
+#Get-ChildItem | Rename-Item -NewName{ $_.Name -replace '_A([1-9])_','_A0$1_'-replace '_B([1-9])_','_B0$1_'-replace '_C([1-9])_','_C0$1_'-replace '_D([1-9])_','_D0$1_'-replace '_E([1-9])_','_E0$1_'-replace '_F([1-9])_','_F0$1_'-replace '_G([1-9])_','_G0$1_'}
+
+# 拡張子がtifのファイルを集めます
+$filter = "*.tif"
+if ($args.Length -eq 1)
+{
+    $filter = Join-Path $Args[0] "*.tif"
+}
+Write-Output $filter
+$files = Get-ChildItem -Path $filter
+
+#----- IDの数値を2桁に変更します -----
+foreach($file in $files)
+{
+    # まずファイル名をアンダーバー(_)で区切ります
+    # ファイル名は"年月日_（時分秒）_???_???_ID_??_??_連番.tif"という形式と仮定します。
+    $array = $file.Name.Split('_')
+    #Write-Output $file.Name
+
+    # IDは5番目なので5番目（PowerShellでは0から数えるので4になっています）の文字列を取得します
+    $id = $array[4]
+    #Write-Output $id
+
+    # IDを英字＋番号に分割します
+    # なお、IDは英字（1桁）＋数値（それ以外）と仮定しています。汎用性を求めるなら英字と数値の違いを調べる必要があります...
+    $alpha = $ID.SubString(0, 1)
+    $no = $ID.Remove(0, 1)
+
+    # 数字を2桁にして新しい文字列を作ります。3桁にしたければPadLeft(3, '0')にすればOKです
+    $newID = $alpha + $no.PadLeft(2, '0')
+    #Write-Output $newID
+
+    # 新しいファイル名を作成します
+    # 以下でやっていることは $newFileName = $array[0] + $array[1] + $array[2] + $array[3] + $newID + $array[5] + $array[6] + $array[7]と同じです
+    $newFileName = "";
+    for($i=0; $i -lt $array.Length; $i++)
+    {
+        if ($i -eq 4)
+        {
+            $newFileName += $newID;
+        }
+        else
+        {
+            $newFileName += $array[$i]
+        }
+
+        # 最後以外は"_"を付加する
+        if ($i -lt $array.Length -1)
+        {
+            $newFileName += "_"
+        }
+    }
+    #Write-Output $newFileName
+
+    # 新しいファイル名で置き換えます
+    #$newFile = Join-Path $file.DirectoryName $newFileName
+    Rename-Item $file $newFileName
+}
