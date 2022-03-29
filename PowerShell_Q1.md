@@ -1,6 +1,6 @@
-# いただいた質問に関する回答です（PowerShell）
+# いただいた質問に関する回答です（PowerShell, VBA）
 
-PowerShell初心者ですので、間違ってたらすみません。m(__)m
+PowerShell, VBA初心者ですので、間違ってたらすみません。m(__)m
 
 ## Q1について
 
@@ -98,4 +98,31 @@ foreach($file in $files)
 _cap0xを付けられるようスクリプトを修正しました。  
 "キャプチャ番号を付加します"とコメントしている部分です。
 
+## Q4について
+
+セルを横に移動しながら背景を塗りつぶすマクロを書いてみました。  
+こちらの方が分かりやすいかと思ったので。  
+
+```
+' セルを塗りつぶすマクロです（４列３行）
+Sub select_celss()
+    Dim rowNumber
+    Dim colNumber
+    Dim rowStart
+    Dim colStart
+    
+    ' 色配列の初期化(R=3,G=4,B=5)
+    Dim colorIndexes() As Variant
+    colorIndexes = Array(3, 4, 5)
+    
+    ' セルを塗りつぶす
+    colStart = 2
+    rowStart = 2
+    For colNumber = 0 To 2
+        For rowNumber = 0 To 3
+            Cells(colStart + colNumber, rowStart + rowNumber).Interior.colorIndex = colorIndexes(colNumber)
+        Next rowNumber
+    Next colNumber
+End Sub
+```
 
