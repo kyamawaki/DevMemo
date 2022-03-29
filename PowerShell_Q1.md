@@ -30,16 +30,15 @@ Get-ChildItem | Rename-Item -NewName{ $_.Name -replace '_A([1-9])_','_A0$1_'-rep
 ```
 # 拡張子がtifのファイルを集めます
 $filter = "*.tif"
-
-# オプションでフォルダを指定することも可能です
 if ($args.Length -eq 1)
 {
     $filter = Join-Path $Args[0] "*.tif"
 }
-Write-Output $filter
+#Write-Output $filter
 $files = Get-ChildItem -Path $filter
 
-#----- IDの数値を2桁に変更します -----
+#!----- IDの数値を2桁に変更します -----!
+$capno = 1;
 foreach($file in $files)
 {
     # まずファイル名をアンダーバー(_)で区切ります
@@ -82,15 +81,21 @@ foreach($file in $files)
     }
     #Write-Output $newFileName
 
-    # 新しいファイル名で置き換えます
-    $newFile = Join-Path $file.DirectoryName $newFileName    
-    Rename-Item $file $newFileName
-}
+    #!----- キャプチャ番号を付加します ------!
+    $capno_ext = "_cap" + $capno.ToString("D2") + ".tif"
+    $newFileName = $newFileName.Replace(".tif", $capno_ext)
+    $capno++;
 
+    # 新しいファイル名で置き換えます
+    $newFile = Join-Path $file.DirectoryName $newFileName
+    Rename-Item $file $newFile
+    #Write-Output $newFile
+}
 ```
 
 ## Q3について
 
-_cap01は簡単に付けられますよ。ちょっと確認できていないので、明日にでも追加します。  
+_cap0xを付けられるようスクリプトを修正しました。  
+"キャプチャ番号を付加します"とコメントしている部分です。
 
 
